@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.consolefire.test.helper</groupId>
+  <artifactId>test-helper-core</artifactId>
+  <versioning>
+    <versions>
+      <version>1.0-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20170310200314</lastUpdated>
+  </versioning>
+</metadata>
