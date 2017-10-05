@@ -4,8 +4,8 @@
   <artifactId>test-helper-core</artifactId>
   <versioning>
     <versions>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>1.0.1-SNAPSHOT</version>
     </versions>
-    <lastUpdated>20171005190224</lastUpdated>
+    <lastUpdated>20171005194702</lastUpdated>
   </versioning>
 </metadata>
