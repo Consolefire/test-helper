@@ -59,8 +59,9 @@ public abstract class ReflectionBasedPojoTest implements TargetObjectProviderFac
         Class<?> targetPojoClass = getTargetPojoRule().getTargetPojoClass();
         return createTargetObject(targetPojoClass);
     }
-    
-    protected Object createTargetObject(Class<?> targetPojoClass) throws InstantiationException, IllegalAccessException {
+
+    protected Object createTargetObject(Class<?> targetPojoClass)
+            throws InstantiationException, IllegalAccessException {
         if (!hasNoArgConstructor(targetPojoClass)) {
             throw new InstantiationException("No default constructor provided for class: " + targetPojoClass.getName());
         }
@@ -78,10 +79,10 @@ public abstract class ReflectionBasedPojoTest implements TargetObjectProviderFac
     }
 
     @Test
-    public void shouldTestAllGetterMethods() throws InstantiationException, IllegalAccessException {
+    public void shouldTestAllGetterMethods() {
         Class<?> targetPojoClass = getTargetPojoRule().getTargetPojoClass();
         List<Method> getterMethods = Stream.of(targetPojoClass.getDeclaredMethods())
-                .filter(m -> m.getName().startsWith("get") && m.isAccessible()).collect(Collectors.toList());
+                .filter(m -> m.getName().startsWith("get")).collect(Collectors.toList());
         if (null != getterMethods) {
             getterMethods.parallelStream().forEach(method -> {
                 try {
@@ -94,10 +95,10 @@ public abstract class ReflectionBasedPojoTest implements TargetObjectProviderFac
     }
 
     @Test
-    public void shouldTestAllsetterMethods() throws InstantiationException, IllegalAccessException {
+    public void shouldTestAllsetterMethods() {
         Class<?> targetPojoClass = getTargetPojoRule().getTargetPojoClass();
         List<Method> getterMethods = Stream.of(targetPojoClass.getDeclaredMethods())
-                .filter(m -> m.getName().startsWith("set") && m.isAccessible()).collect(Collectors.toList());
+                .filter(m -> m.getName().startsWith("set")).collect(Collectors.toList());
         if (null != getterMethods) {
             getterMethods.parallelStream().forEach(method -> {
                 try {
@@ -123,24 +124,24 @@ public abstract class ReflectionBasedPojoTest implements TargetObjectProviderFac
                         } else if (Number.class.isAssignableFrom(paramTypes[0])) {
                             params[0] = 0;
                         } else if (paramTypes[0].isPrimitive()) {
-                            if(Boolean.TYPE.equals(paramTypes[0])) {
+                            if (Boolean.TYPE.equals(paramTypes[0])) {
                                 params[0] = true;
-                            }  else if(Byte.TYPE.equals(paramTypes[0])) {
+                            } else if (Byte.TYPE.equals(paramTypes[0])) {
                                 params[0] = Byte.MIN_VALUE;
-                            } else if(Character.TYPE.equals(paramTypes[0])) {
+                            } else if (Character.TYPE.equals(paramTypes[0])) {
                                 params[0] = 'c';
-                            } else if(Short.TYPE.equals(paramTypes[0])) {
+                            } else if (Short.TYPE.equals(paramTypes[0])) {
+                                params[0] = (short) 1;
+                            } else if (Integer.TYPE.equals(paramTypes[0])) {
                                 params[0] = 1;
-                            } else if(Integer.TYPE.equals(paramTypes[0])) {
-                                params[0] = 1;
-                            }  else if(Long.TYPE.equals(paramTypes[0])) {
+                            } else if (Long.TYPE.equals(paramTypes[0])) {
                                 params[0] = 1L;
-                            } else if(Float.TYPE.equals(paramTypes[0])) {
+                            } else if (Float.TYPE.equals(paramTypes[0])) {
                                 params[0] = 1.0F;
-                            } else if(Double.TYPE.equals(paramTypes[0])) {
+                            } else if (Double.TYPE.equals(paramTypes[0])) {
                                 params[0] = 1.0;
-                            } 
-                            
+                            }
+
                         } else {
                             params[0] = paramTypes[0].newInstance();
                         }
@@ -154,34 +155,33 @@ public abstract class ReflectionBasedPojoTest implements TargetObjectProviderFac
     }
 
     @Test
-    public void shouldTestHashCode() throws InstantiationException, IllegalAccessException {
+    public void shouldTestHashCode() {
         targetPojoObject.hashCode();
     }
 
     @Test
-    public void shouldRetutnTrueFromEqualsIfThisRefEqualsOther() throws InstantiationException, IllegalAccessException {
+    public void shouldRetutnTrueFromEqualsIfThisRefEqualsOther() {
         Object left = targetPojoObject;
         Object other = left;
         assertEquals(true, left.equals(other));
     }
 
     @Test
-    public void shouldRetutnFalseFromEqualsIfOtherIsNull() throws InstantiationException, IllegalAccessException {
+    public void shouldRetutnFalseFromEqualsIfOtherIsNull() {
         Object left = targetPojoObject;
         Object other = null;
         assertEquals(false, left.equals(other));
     }
 
     @Test
-    public void shouldRetutnFalseFromEqualsIfOtherIsNotInstanceofThis()
-            throws InstantiationException, IllegalAccessException {
+    public void shouldRetutnFalseFromEqualsIfOtherIsNotInstanceofThis() {
         Object left = targetPojoObject;
         Object other = new Object();
         assertEquals(false, left.equals(other));
     }
 
     @Test
-    public void shouldGenerateToString() throws InstantiationException, IllegalAccessException {
+    public void shouldGenerateToString() {
         targetPojoObject.toString();
     }
 }

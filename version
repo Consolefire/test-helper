@@ -20,6 +20,8 @@ set_version()
 
 	echo "Setting version: [ $VERSION ]"
 
+	echo $VERSION > version.dat
+
 	mvn versions:set -DnewVersion=$VERSION
 	mvn versions:commit
 }
