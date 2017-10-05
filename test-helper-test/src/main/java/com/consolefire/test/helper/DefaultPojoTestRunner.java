@@ -46,7 +46,13 @@ public class DefaultPojoTestRunner extends ReflectionBasedPojoTest implements Ta
      */
     @Override
     public <T> Object getTargetObject(Class<T> clazz) {
-        return new Object();
+        try {
+            return createTargetObject(clazz);
+        } catch (InstantiationException | IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
