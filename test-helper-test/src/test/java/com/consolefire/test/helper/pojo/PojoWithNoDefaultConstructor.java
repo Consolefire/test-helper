@@ -14,14 +14,19 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class PojoWithNoDefaultArgument {
+public class PojoWithNoDefaultConstructor {
 
     private int value;
+    private String txt;
+    private double d;
+    private float f;
+    private short s;
+    private char c;
 
-    public PojoWithNoDefaultArgument(int value) {
+    public PojoWithNoDefaultConstructor(int value) {
         this.value = value;
     }
-    
-    
-    
+
+
+
 }

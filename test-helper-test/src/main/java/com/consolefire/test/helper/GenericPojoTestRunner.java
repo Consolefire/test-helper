@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-public class GenericPojoTestRunner<P> extends ReflectionBasedPojoTest {
+public class GenericPojoTestRunner<P> extends ReflectionBasedPojoTest implements TargetObjectProvider {
 
     @Override
     public ReflectionBasedPojoTestRule getTargetPojoRule() {
@@ -24,6 +24,34 @@ public class GenericPojoTestRunner<P> extends ReflectionBasedPojoTest {
             return clazz;
         }
         throw new RuntimeException("No generic parameter defined to identify the target POJO class.");
+    }
+
+
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.consolefire.test.helper.TargetObjectProviderFactory#getTargetObjectProvider()
+     */
+    @Override
+    public TargetObjectProvider getTargetObjectProvider() {
+        return this;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.consolefire.test.helper.TargetObjectProvider#getTargetObject(java.lang.Class)
+     */
+    @Override
+    public <T> Object getTargetObject(Class<T> clazz) {
+        try {
+            return super.createTargetObject(clazz);
+        } catch (InstantiationException | IllegalAccessException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
@@ -45,5 +73,7 @@ public class GenericPojoTestRunner<P> extends ReflectionBasedPojoTest {
     public void shouldGenerateLogicalHashCode() {
         assertTrue(true);
     }
+
+
 
 }

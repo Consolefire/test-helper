@@ -2,11 +2,11 @@ package com.consolefire.test.helper;
 
 import static org.junit.Assert.assertTrue;
 
-public class DefaultPojoTestRunner extends ReflectionBasedPojoTest {
+public class DefaultPojoTestRunner extends ReflectionBasedPojoTest implements TargetObjectProvider {
 
     @Override
     public ReflectionBasedPojoTestRule getTargetPojoRule() {
-        return new ReflectionBasedPojoTestRule(Void.class);
+        return new ReflectionBasedPojoTestRule(Object.class);
     }
 
     @Override
@@ -27,6 +27,26 @@ public class DefaultPojoTestRunner extends ReflectionBasedPojoTest {
     @Override
     public void shouldGenerateLogicalHashCode() {
         assertTrue(true);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.consolefire.test.helper.TargetObjectProviderFactory#getTargetObjectProvider()
+     */
+    @Override
+    public TargetObjectProvider getTargetObjectProvider() {
+        return this;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.consolefire.test.helper.TargetObjectProvider#getTargetObject(java.lang.Class)
+     */
+    @Override
+    public <T> Object getTargetObject(Class<T> clazz) {
+        return new Object();
     }
 
 }

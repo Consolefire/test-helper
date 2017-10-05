@@ -17,21 +17,26 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
-public abstract class ReflectionBasedPojoTest {
+public abstract class ReflectionBasedPojoTest implements TargetObjectProviderFactory {
 
     private Object targetPojoObject;
+    private final TargetObjectProvider targetObjectProvider;
 
     @Getter
     @Setter
     private boolean ignoreOnError = true;
+
+    public ReflectionBasedPojoTest() {
+        this.targetObjectProvider = getTargetObjectProvider();
+    }
 
     public abstract ReflectionBasedPojoTestRule getTargetPojoRule();
 
     @Before
     public void setup() {
         try {
-            targetPojoObject = createTargetObject();
-        } catch (InstantiationException | IllegalAccessException e) {
+            targetPojoObject = targetObjectProvider.getTargetObject(getTargetPojoRule().getTargetPojoClass());
+        } catch (Exception e) {
 
         }
         // ignore this test case if it failed to create instance of the target POJO.
@@ -50,8 +55,12 @@ public abstract class ReflectionBasedPojoTest {
     @Test
     public abstract void shouldGenerateLogicalHashCode();
 
-    private Object createTargetObject() throws InstantiationException, IllegalAccessException {
+    protected Object createTargetObject() throws InstantiationException, IllegalAccessException {
         Class<?> targetPojoClass = getTargetPojoRule().getTargetPojoClass();
+        return createTargetObject(targetPojoClass);
+    }
+    
+    protected Object createTargetObject(Class<?> targetPojoClass) throws InstantiationException, IllegalAccessException {
         if (!hasNoArgConstructor(targetPojoClass)) {
             throw new InstantiationException("No default constructor provided for class: " + targetPojoClass.getName());
         }
@@ -88,7 +97,7 @@ public abstract class ReflectionBasedPojoTest {
     public void shouldTestAllsetterMethods() throws InstantiationException, IllegalAccessException {
         Class<?> targetPojoClass = getTargetPojoRule().getTargetPojoClass();
         List<Method> getterMethods = Stream.of(targetPojoClass.getDeclaredMethods())
-                .filter(m -> m.getName().startsWith("set")).collect(Collectors.toList());
+                .filter(m -> m.getName().startsWith("set") && m.isAccessible()).collect(Collectors.toList());
         if (null != getterMethods) {
             getterMethods.parallelStream().forEach(method -> {
                 try {
@@ -113,6 +122,25 @@ public abstract class ReflectionBasedPojoTest {
                             params[0] = Short.valueOf((short) 0);
                         } else if (Number.class.isAssignableFrom(paramTypes[0])) {
                             params[0] = 0;
+                        } else if (paramTypes[0].isPrimitive()) {
+                            if(Boolean.TYPE.equals(paramTypes[0])) {
+                                params[0] = true;
+                            }  else if(Byte.TYPE.equals(paramTypes[0])) {
+                                params[0] = Byte.MIN_VALUE;
+                            } else if(Character.TYPE.equals(paramTypes[0])) {
+                                params[0] = 'c';
+                            } else if(Short.TYPE.equals(paramTypes[0])) {
+                                params[0] = 1;
+                            } else if(Integer.TYPE.equals(paramTypes[0])) {
+                                params[0] = 1;
+                            }  else if(Long.TYPE.equals(paramTypes[0])) {
+                                params[0] = 1L;
+                            } else if(Float.TYPE.equals(paramTypes[0])) {
+                                params[0] = 1.0F;
+                            } else if(Double.TYPE.equals(paramTypes[0])) {
+                                params[0] = 1.0;
+                            } 
+                            
                         } else {
                             params[0] = paramTypes[0].newInstance();
                         }

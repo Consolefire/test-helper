@@ -15,6 +15,13 @@ import org.mockito.runners.MockitoJUnitRunner;
  *
  */
 @RunWith(MockitoJUnitRunner.class)
-public class PojoWithNoDefaultArgumentTest extends GenericPojoTestRunner<PojoWithNoDefaultArgument> {
+public class PojoWithNoDefaultConstructorTest extends GenericPojoTestRunner<PojoWithNoDefaultConstructor> {
 
+    @Override
+    public <T> Object getTargetObject(Class<T> clazz) {
+        return new PojoWithNoDefaultConstructor(100);
+    }
+
+    
+    
 }
