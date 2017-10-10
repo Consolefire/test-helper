@@ -12,5 +12,5 @@ package com.consolefire.test.helper;
 public interface TargetObjectProviderFactory {
 
     TargetObjectProvider getTargetObjectProvider();
-
+    
 }

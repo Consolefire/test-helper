@@ -1,8 +1,13 @@
 package com.consolefire.test.helper;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class DefaultTestCaseContext {
     private static volatile DefaultTestCaseContext context;
 
+    private final Set<Class<?>> classesUnderTest = new HashSet<>();
+    
     private DefaultTestCaseContext() {
 
     }

@@ -39,6 +39,7 @@ public class DefaultPojoTestRunner extends ReflectionBasedPojoTest implements Ta
         return this;
     }
 
+
     /*
      * (non-Javadoc)
      * 

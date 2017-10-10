@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>com.consolefire.test.helper</groupId>
 		<artifactId>test-helper</artifactId>
-		<version>1.0.3-SNAPSHOT</version>
+		<version>1.0.5-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>test-helper-core</artifactId>

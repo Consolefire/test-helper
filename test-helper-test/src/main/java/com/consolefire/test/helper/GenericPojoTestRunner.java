@@ -11,6 +11,7 @@ public class GenericPojoTestRunner<P> extends ReflectionBasedPojoTest implements
     public ReflectionBasedPojoTestRule getTargetPojoRule() {
         return new ReflectionBasedPojoTestRule(getPojoClass());
     }
+    
 
     /**
      * @return
@@ -37,6 +38,7 @@ public class GenericPojoTestRunner<P> extends ReflectionBasedPojoTest implements
     public TargetObjectProvider getTargetObjectProvider() {
         return this;
     }
+    
 
     /*
      * (non-Javadoc)

@@ -31,7 +31,7 @@ public abstract class ReflectionBasedPojoTest implements TargetObjectProviderFac
     }
 
     public abstract ReflectionBasedPojoTestRule getTargetPojoRule();
-
+    
     @Before
     public void setup() {
         try {
