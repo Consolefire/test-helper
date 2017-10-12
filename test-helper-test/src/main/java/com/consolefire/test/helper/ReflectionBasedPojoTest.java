@@ -2,13 +2,16 @@ package com.consolefire.test.helper;
 
 import static org.junit.Assert.assertEquals;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -31,7 +34,7 @@ public abstract class ReflectionBasedPojoTest implements TargetObjectProviderFac
     }
 
     public abstract ReflectionBasedPojoTestRule getTargetPojoRule();
-    
+
     @Before
     public void setup() {
         try {
@@ -81,8 +84,7 @@ public abstract class ReflectionBasedPojoTest implements TargetObjectProviderFac
     @Test
     public void shouldTestAllGetterMethods() {
         Class<?> targetPojoClass = getTargetPojoRule().getTargetPojoClass();
-        List<Method> getterMethods = Stream.of(targetPojoClass.getDeclaredMethods())
-                .filter(m -> m.getName().startsWith("get")).collect(Collectors.toList());
+        List<Method> getterMethods = extractGetterMethods(targetPojoClass);
         if (null != getterMethods) {
             getterMethods.parallelStream().forEach(method -> {
                 try {
@@ -97,54 +99,17 @@ public abstract class ReflectionBasedPojoTest implements TargetObjectProviderFac
     @Test
     public void shouldTestAllsetterMethods() {
         Class<?> targetPojoClass = getTargetPojoRule().getTargetPojoClass();
-        List<Method> getterMethods = Stream.of(targetPojoClass.getDeclaredMethods())
-                .filter(m -> m.getName().startsWith("set")).collect(Collectors.toList());
-        if (null != getterMethods) {
-            getterMethods.parallelStream().forEach(method -> {
+        List<Method> setterMethods = extractSetterMethods(targetPojoClass);
+        if (null != setterMethods) {
+            setterMethods.parallelStream().forEach(method -> {
                 try {
                     Class<?>[] paramTypes = method.getParameterTypes();
                     if (null != paramTypes && paramTypes.length == 1) {
                         Object[] params = new Object[paramTypes.length];
-                        if (Set.class.isAssignableFrom(paramTypes[0])) {
-                            params[0] = Collections.EMPTY_SET;
-                        } else if (List.class.isAssignableFrom(paramTypes[0])) {
-                            params[0] = Collections.EMPTY_LIST;
-                        } else if (Boolean.class.isAssignableFrom(paramTypes[0])) {
-                            params[0] = Boolean.TRUE;
-                        } else if (Integer.class.isAssignableFrom(paramTypes[0])) {
-                            params[0] = Integer.valueOf(0);
-                        } else if (Float.class.isAssignableFrom(paramTypes[0])) {
-                            params[0] = Float.valueOf(0);
-                        } else if (Long.class.isAssignableFrom(paramTypes[0])) {
-                            params[0] = 0L;
-                        } else if (Double.class.isAssignableFrom(paramTypes[0])) {
-                            params[0] = 0.0;
-                        } else if (Short.class.isAssignableFrom(paramTypes[0])) {
-                            params[0] = Short.valueOf((short) 0);
-                        } else if (Number.class.isAssignableFrom(paramTypes[0])) {
-                            params[0] = 0;
-                        } else if (paramTypes[0].isPrimitive()) {
-                            if (Boolean.TYPE.equals(paramTypes[0])) {
-                                params[0] = true;
-                            } else if (Byte.TYPE.equals(paramTypes[0])) {
-                                params[0] = Byte.MIN_VALUE;
-                            } else if (Character.TYPE.equals(paramTypes[0])) {
-                                params[0] = 'c';
-                            } else if (Short.TYPE.equals(paramTypes[0])) {
-                                params[0] = (short) 1;
-                            } else if (Integer.TYPE.equals(paramTypes[0])) {
-                                params[0] = 1;
-                            } else if (Long.TYPE.equals(paramTypes[0])) {
-                                params[0] = 1L;
-                            } else if (Float.TYPE.equals(paramTypes[0])) {
-                                params[0] = 1.0F;
-                            } else if (Double.TYPE.equals(paramTypes[0])) {
-                                params[0] = 1.0;
-                            }
-
-                        } else {
-                            params[0] = paramTypes[0].newInstance();
-                        }
+                        Class<?> paramType = paramTypes[0];
+                        Object paramToSet = new Object();
+                        paramToSet = initializeSetterParameter(paramType, paramToSet);
+                        params[0] = paramToSet;
                         method.invoke(targetPojoObject, params);
                     }
                 } catch (Exception exception) {
@@ -152,6 +117,83 @@ public abstract class ReflectionBasedPojoTest implements TargetObjectProviderFac
                 }
             });
         }
+    }
+
+
+    private List<Method> extractSetterMethods(Class<?> targetPojoClass) {
+        return extractGetterOrSetterMethods(targetPojoClass, true);
+    }
+
+    private List<Method> extractGetterMethods(Class<?> targetPojoClass) {
+        return extractGetterOrSetterMethods(targetPojoClass, false);
+    }
+
+    private List<Method> extractGetterOrSetterMethods(Class<?> targetPojoClass, boolean setter) {
+        List<Method> methods = new ArrayList<>();
+        Field[] fields = targetPojoClass.getDeclaredFields();
+        if (null != fields && fields.length > 0) {
+            Arrays.stream(fields).forEach(field -> {
+                try {
+                    PropertyDescriptor propertyDescriptor = new PropertyDescriptor(field.getName(), targetPojoClass);
+                    if (setter) {
+                        methods.add(propertyDescriptor.getWriteMethod());
+                    } else {
+                        methods.add(propertyDescriptor.getReadMethod());
+                    }
+                } catch (IntrospectionException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+
+
+        return methods;
+    }
+
+
+    private Object initializeSetterParameter(final Class<?> paramType, Object paramToSet)
+            throws InstantiationException, IllegalAccessException {
+        if (Set.class.isAssignableFrom(paramType)) {
+            paramToSet = Collections.EMPTY_SET;
+        } else if (List.class.isAssignableFrom(paramType)) {
+            paramToSet = Collections.EMPTY_LIST;
+        } else if (Boolean.class.isAssignableFrom(paramType)) {
+            paramToSet = Boolean.TRUE;
+        } else if (Integer.class.isAssignableFrom(paramType)) {
+            paramToSet = Integer.valueOf(0);
+        } else if (Float.class.isAssignableFrom(paramType)) {
+            paramToSet = Float.valueOf(0);
+        } else if (Long.class.isAssignableFrom(paramType)) {
+            paramToSet = 0L;
+        } else if (Double.class.isAssignableFrom(paramType)) {
+            paramToSet = 0.0;
+        } else if (Short.class.isAssignableFrom(paramType)) {
+            paramToSet = Short.valueOf((short) 0);
+        } else if (Number.class.isAssignableFrom(paramType)) {
+            paramToSet = 0;
+        } else if (paramType.isPrimitive()) {
+            if (Boolean.TYPE.equals(paramType)) {
+                paramToSet = true;
+            } else if (Byte.TYPE.equals(paramType)) {
+                paramToSet = Byte.MIN_VALUE;
+            } else if (Character.TYPE.equals(paramType)) {
+                paramToSet = 'c';
+            } else if (Short.TYPE.equals(paramType)) {
+                paramToSet = (short) 1;
+            } else if (Integer.TYPE.equals(paramType)) {
+                paramToSet = 1;
+            } else if (Long.TYPE.equals(paramType)) {
+                paramToSet = 1L;
+            } else if (Float.TYPE.equals(paramType)) {
+                paramToSet = 1.0F;
+            } else if (Double.TYPE.equals(paramType)) {
+                paramToSet = 1.0;
+            }
+
+        } else {
+            paramToSet = paramType.newInstance();
+        }
+        return paramToSet;
     }
 
     @Test
