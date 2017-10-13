@@ -107,8 +107,8 @@ public abstract class ReflectionBasedPojoTest implements TargetObjectProviderFac
                     if (null != paramTypes && paramTypes.length == 1) {
                         Object[] params = new Object[paramTypes.length];
                         Class<?> paramType = paramTypes[0];
-                        Object paramToSet = new Object();
-                        paramToSet = initializeSetterParameter(paramType, paramToSet);
+                        Object paramToSet = null;
+                        paramToSet = initializeSetterParameter(paramType);
                         params[0] = paramToSet;
                         method.invoke(targetPojoObject, params);
                     }
@@ -151,49 +151,47 @@ public abstract class ReflectionBasedPojoTest implements TargetObjectProviderFac
     }
 
 
-    private Object initializeSetterParameter(final Class<?> paramType, Object paramToSet)
+    private Object initializeSetterParameter(final Class<?> paramType)
             throws InstantiationException, IllegalAccessException {
         if (Set.class.isAssignableFrom(paramType)) {
-            paramToSet = Collections.EMPTY_SET;
+            return Collections.EMPTY_SET;
         } else if (List.class.isAssignableFrom(paramType)) {
-            paramToSet = Collections.EMPTY_LIST;
+            return Collections.EMPTY_LIST;
         } else if (Boolean.class.isAssignableFrom(paramType)) {
-            paramToSet = Boolean.TRUE;
+            return Boolean.TRUE;
         } else if (Integer.class.isAssignableFrom(paramType)) {
-            paramToSet = Integer.valueOf(0);
+            return Integer.valueOf(0);
         } else if (Float.class.isAssignableFrom(paramType)) {
-            paramToSet = Float.valueOf(0);
+            return Float.valueOf(0);
         } else if (Long.class.isAssignableFrom(paramType)) {
-            paramToSet = 0L;
+            return 0L;
         } else if (Double.class.isAssignableFrom(paramType)) {
-            paramToSet = 0.0;
+            return 0.0;
         } else if (Short.class.isAssignableFrom(paramType)) {
-            paramToSet = Short.valueOf((short) 0);
+            return Short.valueOf((short) 0);
         } else if (Number.class.isAssignableFrom(paramType)) {
-            paramToSet = 0;
+            return 0;
         } else if (paramType.isPrimitive()) {
             if (Boolean.TYPE.equals(paramType)) {
-                paramToSet = true;
+                return true;
             } else if (Byte.TYPE.equals(paramType)) {
-                paramToSet = Byte.MIN_VALUE;
+                return Byte.MIN_VALUE;
             } else if (Character.TYPE.equals(paramType)) {
-                paramToSet = 'c';
+                return 'c';
             } else if (Short.TYPE.equals(paramType)) {
-                paramToSet = (short) 1;
+                return (short) 1;
             } else if (Integer.TYPE.equals(paramType)) {
-                paramToSet = 1;
+                return 1;
             } else if (Long.TYPE.equals(paramType)) {
-                paramToSet = 1L;
+                return 1L;
             } else if (Float.TYPE.equals(paramType)) {
-                paramToSet = 1.0F;
+                return 1.0F;
             } else if (Double.TYPE.equals(paramType)) {
-                paramToSet = 1.0;
+                return 1.0;
             }
 
-        } else {
-            paramToSet = paramType.newInstance();
-        }
-        return paramToSet;
+        } 
+        return null;
     }
 
     @Test
